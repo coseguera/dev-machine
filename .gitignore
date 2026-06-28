@@ -1,0 +1,22 @@
+# --- Secrets & host-specific overlays (NEVER commit) ---
+# dev-machine is host-unaware, but keep the same guardrails so no host overlay
+# ever leaks credentials or network specifics if vendored alongside.
+*.local
+*.local.*
+secrets/
+
+# SSH keys / generated identities
+id_*
+*.pem
+*.key
+known_hosts
+
+# Generic env / credential files
+.env
+*.env
+!*.example.env
+
+# --- Editor / OS noise ---
+.DS_Store
+*.swp
+*~

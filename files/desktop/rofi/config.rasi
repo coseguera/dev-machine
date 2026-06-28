@@ -1,0 +1,7 @@
+/* dev-machine rofi config (drun launcher, dark built-in theme). */
+configuration {
+    font: "JetBrainsMono Nerd Font 11";
+    show-icons: true;
+    drun-display-format: "{name}";
+}
+@theme "Arc-Dark"

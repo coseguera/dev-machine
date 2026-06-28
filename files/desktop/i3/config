@@ -1,0 +1,109 @@
+# i3 config - dev-machine local desktop (Tokyo Night).
+# X11 + a real keyboard, so bindings use bindsym with Super ($mod = Mod4).
+# (This is the local-desktop counterpart to a VNC setup; no Mod1/bindcode hacks.)
+set $mod Mod4
+
+font pango:JetBrainsMono Nerd Font 10
+
+# Tokyo Night palette
+set $bg   #1a1b26
+set $fg   #c0caf5
+set $blue #7aa2f7
+set $gray #414868
+set $dim  #565f89
+set $red  #f7768e
+
+# gaps (i3 4.22+) and thin borders
+gaps inner 8
+gaps outer 3
+smart_gaps on
+default_border pixel 2
+default_floating_border pixel 2
+
+# class                 border  bground text  indicator child_border
+client.focused          $blue   $bg     $fg   $blue     $blue
+client.focused_inactive $gray   $bg     $fg   $gray     $gray
+client.unfocused        $gray   $bg     $dim  $gray     $gray
+client.urgent           $red    $bg     $fg   $red      $red
+
+# terminal + launcher + kill
+bindsym $mod+Return exec --no-startup-id alacritty
+bindsym $mod+d exec --no-startup-id rofi -show drun
+bindsym $mod+Shift+q kill
+
+# focus (vim keys + arrows)
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# move
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+# split / layout
+bindsym $mod+b split h
+bindsym $mod+v split v
+bindsym $mod+f fullscreen toggle
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+bindsym $mod+Shift+space floating toggle
+bindsym $mod+space focus mode_toggle
+
+# workspaces
+bindsym $mod+1 workspace number 1
+bindsym $mod+2 workspace number 2
+bindsym $mod+3 workspace number 3
+bindsym $mod+4 workspace number 4
+bindsym $mod+5 workspace number 5
+bindsym $mod+Shift+1 move container to workspace number 1
+bindsym $mod+Shift+2 move container to workspace number 2
+bindsym $mod+Shift+3 move container to workspace number 3
+bindsym $mod+Shift+4 move container to workspace number 4
+bindsym $mod+Shift+5 move container to workspace number 5
+
+# reload / restart / exit
+bindsym $mod+Shift+c reload
+bindsym $mod+Shift+r restart
+bindsym $mod+Shift+e exec --no-startup-id i3-nagbar -m 'Exit i3?' -b 'Yes' 'i3-msg exit'
+
+# resize mode (plain keys, no mod)
+mode "resize" {
+        bindsym h resize shrink width 5 px or 5 ppt
+        bindsym j resize grow height 5 px or 5 ppt
+        bindsym k resize shrink height 5 px or 5 ppt
+        bindsym l resize grow width 5 px or 5 ppt
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+bindsym $mod+r mode "resize"
+
+# solid Tokyo Night background (no compositor/wallpaper dependency)
+exec_always --no-startup-id xsetroot -solid "#1a1b26"
+
+# bar: i3's built-in bar + i3status (lightweight; no polybar dependency)
+bar {
+        status_command i3status
+        position top
+        font pango:JetBrainsMono Nerd Font 10
+        colors {
+                background $bg
+                statusline $fg
+                separator  $gray
+                focused_workspace  $blue $blue $bg
+                active_workspace   $gray $gray $fg
+                inactive_workspace $bg   $bg   $dim
+                urgent_workspace   $red  $red  $fg
+        }
+}
