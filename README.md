@@ -37,7 +37,7 @@ sudo ./install.sh [options]
 | `--minimal-treesitter` | Trim Treesitter to a minimal parser set (lite). |
 | `--no-lazygit` | Skip the lazygit release download. |
 | `--with-console` | Install cage + foot + a Nerd Font; stage `foot.ini`. |
-| `--with-desktop` | Install i3 + Xorg + i3status + alacritty + fonts. |
+| `--with-desktop` | Install i3 + Xorg + i3status + alacritty + flameshot + fonts. |
 | `--with-browser=NAME` | `firefox` \| `chromium` \| `none` (default `none`). Requires `--with-desktop`. |
 
 - `--target-dir /etc/skel` (default) -- a **multi-user template**: each new
@@ -79,6 +79,7 @@ files/
   desktop/i3status/config           -> staged only with --with-desktop
   desktop/alacritty/alacritty.{yml,toml} -> staged (version-matched) with --with-desktop
   desktop/rofi/config.rasi          -> staged only with --with-desktop
+  desktop/flameshot/flameshot.ini   -> staged only with --with-desktop
 ```
 
 The terminal for `--with-desktop` is **alacritty** (Rust, memory-safe, minimal

@@ -31,6 +31,13 @@ bindsym $mod+Return exec --no-startup-id alacritty
 bindsym $mod+d exec --no-startup-id rofi -show drun
 bindsym $mod+Shift+q kill
 
+# screenshots (flameshot): region select then annotate/copy/save from its toolbar.
+# Print is for keyboards with a PrintScreen key; $mod+Shift+p is the equivalent for
+# keyboards without one. Saved shots default to ~/Pictures (XDG); the toolbar's copy
+# button puts the grab on the clipboard (handy to @-mention in the Copilot CLI).
+bindsym Print exec --no-startup-id flameshot gui
+bindsym $mod+Shift+p exec --no-startup-id flameshot gui
+
 # focus (vim keys + arrows)
 bindsym $mod+h focus left
 bindsym $mod+j focus down
@@ -91,6 +98,9 @@ bindsym $mod+r mode "resize"
 
 # solid Tokyo Night background (no compositor/wallpaper dependency)
 exec_always --no-startup-id xsetroot -solid "#1a1b26"
+
+# flameshot daemon (so `flameshot gui` is instant; tray icon disabled in config)
+exec --no-startup-id flameshot
 
 # bar: i3's built-in bar + i3status (lightweight; no polybar dependency)
 bar {

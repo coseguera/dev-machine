@@ -22,7 +22,7 @@
 #   - Neovim (release) + LazyVim starter config                  (always)
 #   - lazygit (release)                                           (unless --no-lazygit)
 #   - cage + foot + Nerd Font (local kiosk console)              (--with-console)
-#   - i3 + Xorg + i3status + alacritty + fonts (desktop)            (--with-desktop)
+#   - i3 + Xorg + i3status + alacritty + flameshot + fonts (desktop) (--with-desktop)
 #   - a browser                                                   (--with-browser=...)
 #
 # LazyVim "lite" knobs (staged as override Lua specs, only when set):
@@ -41,7 +41,7 @@
 #     --minimal-treesitter    Trim Treesitter to a minimal parser set.
 #     --no-lazygit            Skip the lazygit release download.
 #     --with-console          Install cage + foot + a Nerd Font; stage foot.ini.
-#     --with-desktop          Install i3 + Xorg + i3status + alacritty + fonts.
+#     --with-desktop          Install i3 + Xorg + i3status + alacritty + flameshot.
 #     --with-browser=NAME     firefox | chromium | none (default none).
 #                             Requires --with-desktop when not 'none'.
 #     -h | --help             Show this header.
@@ -244,6 +244,7 @@ if [ "$WITH_DESKTOP" -eq 1 ]; then
   apt-get install -y \
     xserver-xorg xinit x11-xserver-utils \
     i3 rofi alacritty \
+    flameshot \
     fontconfig fonts-noto-color-emoji \
     || die "desktop package install failed"
   install_nerd_font
@@ -288,6 +289,13 @@ if [ "$WITH_DESKTOP" -eq 1 ]; then
   install -m 0644 "$FILES_DIR/desktop/i3/config"        "$TARGET_DIR/.config/i3/config"
   install -m 0644 "$FILES_DIR/desktop/i3status/config"  "$TARGET_DIR/.config/i3status/config"
   install -m 0644 "$FILES_DIR/desktop/rofi/config.rasi" "$TARGET_DIR/.config/rofi/config.rasi"
+  # flameshot screenshots (bound to Print / $mod+Shift+p in i3). Config disables the
+  # tray icon (i3bar has no systray here) and the startup popup; savePath is left
+  # unset so flameshot uses the XDG Pictures dir (~/Pictures), which keeps this
+  # home-agnostic for /etc/skel-based multi-user provisioning. Pre-create ~/Pictures
+  # so the first save never fails on a minimal image.
+  mkdir -p "$TARGET_DIR/.config/flameshot" "$TARGET_DIR/Pictures"
+  install -m 0644 "$FILES_DIR/desktop/flameshot/flameshot.ini" "$TARGET_DIR/.config/flameshot/flameshot.ini"
   # alacritty switched its config format from YAML to TOML in 0.13; stage the form
   # that matches the installed version (Pi OS Bookworm ships 0.12 = YAML).
   av="$(alacritty --version 2>/dev/null | awk '{print $2}')"   # e.g. 0.12.3
@@ -347,7 +355,7 @@ fi
 # $HOME), so a root-run install does not leave root-owned files in a user home.
 owner="$(stat -c '%U' "$TARGET_DIR")"
 group="$(stat -c '%G' "$TARGET_DIR")"
-for p in .tmux.conf .gitconfig .bashrc .bashrc.d .config/nvim .config/lazygit .config/foot .config/i3 .config/i3status .config/alacritty .config/rofi; do
+for p in .tmux.conf .gitconfig .bashrc .bashrc.d .config/nvim .config/lazygit .config/foot .config/i3 .config/i3status .config/alacritty .config/rofi .config/flameshot Pictures; do
   [ -e "$TARGET_DIR/$p" ] || continue
   chown -R "$owner:$group" "$TARGET_DIR/$p"
   find "$TARGET_DIR/$p" -type d -exec chmod 0755 {} +
