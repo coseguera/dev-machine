@@ -356,7 +356,7 @@ fi
 # $HOME), so a root-run install does not leave root-owned files in a user home.
 owner="$(stat -c '%U' "$TARGET_DIR")"
 group="$(stat -c '%G' "$TARGET_DIR")"
-for p in .tmux.conf .gitconfig .bashrc .bashrc.d .config/nvim .config/lazygit .config/foot .config/i3 .config/i3status .config/alacritty .config/rofi .config/flameshot Pictures; do
+for p in .tmux.conf .gitconfig .bashrc .bashrc.d .config .local .cache Pictures; do
   [ -e "$TARGET_DIR/$p" ] || continue
   chown -R "$owner:$group" "$TARGET_DIR/$p"
   find "$TARGET_DIR/$p" -type d -exec chmod 0755 {} +
