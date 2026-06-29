@@ -96,6 +96,9 @@ mode "resize" {
 }
 bindsym $mod+r mode "resize"
 
+# adapt font/bar size to the display dpi (re-applies on monitor hotplug)
+exec_always --no-startup-id ~/.config/i3/set-dpi.sh
+
 # solid Tokyo Night background (no compositor/wallpaper dependency)
 exec_always --no-startup-id xsetroot -solid "#1a1b26"
 

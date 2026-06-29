@@ -1,4 +1,6 @@
 # i3status - dev-machine local desktop (Tokyo Night colors, Nerd Font glyphs).
+# azure-style: net (ethernet if cable, else wifi) + clock. Workspaces sit on the
+# left in i3bar; this fills the right. Disk/mem/cpu intentionally omitted.
 general {
         colors = true
         interval = 5
@@ -7,30 +9,13 @@ general {
         color_bad = "#f7768e"
 }
 
-order += "disk /"
-order += "memory"
-order += "cpu_usage"
 order += "ethernet _first_"
 order += "wireless _first_"
 order += "tztime local"
 
-disk "/" {
-        format = " %avail"
-}
-
-memory {
-        format = " %used"
-        threshold_degraded = "10%"
-        format_degraded = "MEMORY < %available"
-}
-
-cpu_usage {
-        format = " %usage"
-}
-
 ethernet _first_ {
         format_up = " %ip"
-        format_down = " down"
+        format_down = ""
 }
 
 wireless _first_ {
