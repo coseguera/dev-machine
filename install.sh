@@ -287,6 +287,7 @@ if [ "$WITH_DESKTOP" -eq 1 ]; then
   mkdir -p "$TARGET_DIR/.config/i3" "$TARGET_DIR/.config/i3status" \
            "$TARGET_DIR/.config/alacritty" "$TARGET_DIR/.config/rofi"
   install -m 0644 "$FILES_DIR/desktop/i3/config"        "$TARGET_DIR/.config/i3/config"
+  install -m 0755 "$FILES_DIR/desktop/i3/set-dpi.sh"    "$TARGET_DIR/.config/i3/set-dpi.sh"
   install -m 0644 "$FILES_DIR/desktop/i3status/config"  "$TARGET_DIR/.config/i3status/config"
   install -m 0644 "$FILES_DIR/desktop/rofi/config.rasi" "$TARGET_DIR/.config/rofi/config.rasi"
   # flameshot screenshots (bound to Print / $mod+Shift+p in i3). Config disables the
