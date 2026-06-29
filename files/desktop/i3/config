@@ -108,6 +108,7 @@ exec --no-startup-id flameshot
 # bar: i3's built-in bar + i3status (lightweight; no polybar dependency)
 bar {
         status_command i3status
+        separator_symbol " "
         position top
         font pango:JetBrainsMono Nerd Font 10
         colors {

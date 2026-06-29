@@ -19,10 +19,10 @@ ethernet _first_ {
 }
 
 wireless _first_ {
-        format_up = " %essid"
+        format_up = " "
         format_down = ""
 }
 
 tztime local {
-        format = " %Y-%m-%d  %H:%M"
+        format = " %Y-%m-%d  %H:%M "
 }
