@@ -5,6 +5,11 @@
 # dpi from the connected display's pixel width and physical mm, clamp + snap it to
 # a crisp step, and set Xft.dpi. Re-run from i3 exec_always so it tracks hotplug.
 # Single source of truth: the configs keep one font size; dpi does the scaling.
+# --no-restart: merge the dpi but skip the i3 restart. Run this from xinitrc BEFORE
+# i3 starts so i3bar/pango load at the right dpi on every boot (the exec_always run
+# inside i3 then restarts only on a real dpi change, e.g. monitor hotplug).
+no_restart=0
+[ "$1" = "--no-restart" ] && no_restart=1
 
 # Pull the active mode's pixel width and the panel's physical width (mm) from the
 # primary (or first) connected output, e.g. "3840x2160+0+0 ... 608mm x 345mm".
@@ -44,6 +49,6 @@ cache="${XDG_CACHE_HOME:-$HOME/.cache}/dev-machine-dpi"
 prev=""; [ -f "$cache" ] && prev="$(cat "$cache" 2>/dev/null)"
 if [ "$dpi" != "$prev" ]; then
   mkdir -p "$(dirname "$cache")"; echo "$dpi" > "$cache"
-  i3-msg restart >/dev/null 2>&1 || true
+  [ "$no_restart" -eq 1 ] || i3-msg restart >/dev/null 2>&1 || true
 fi
 
