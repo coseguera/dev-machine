@@ -1,0 +1,48 @@
+/* dev-machine wofi style - Tokyo Night, JetBrainsMono Nerd Font. */
+* {
+    font-family: "JetBrainsMono Nerd Font";
+    font-size: 14px;
+}
+
+window {
+    background-color: #1a1b26;
+    border: 2px solid #7aa2f7;
+    border-radius: 6px;
+}
+
+#input {
+    margin: 6px;
+    padding: 6px;
+    color: #c0caf5;
+    background-color: #15161e;
+    border: 1px solid #414868;
+    border-radius: 4px;
+}
+
+#inner-box {
+    margin: 6px;
+    background-color: #1a1b26;
+}
+
+#outer-box {
+    margin: 0px;
+    background-color: #1a1b26;
+}
+
+#scroll {
+    margin: 0px;
+}
+
+#text {
+    padding: 4px;
+    color: #c0caf5;
+}
+
+#entry:selected {
+    background-color: #7aa2f7;
+    border-radius: 4px;
+}
+
+#text:selected {
+    color: #1a1b26;
+}

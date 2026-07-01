@@ -17,7 +17,7 @@ granular on/off flags.
   `git-delta`, `tmux`, build deps, Python venv/pipx; `gh`; Neovim (release) +
   the LazyVim starter config.
 - Optionally installs Node.js + Copilot CLI, lazygit, a local console
-  (cage + foot), or a local desktop (i3 + browser) -- see the flags below.
+  (cage + foot), or a local desktop (sway + browser) -- see the flags below.
 
 It uses no system keyring: the agentic `@github/copilot` CLI keeps its token in a
 file under `~/.copilot`, so there is nothing to unlock.
@@ -37,7 +37,7 @@ sudo ./install.sh [options]
 | `--minimal-treesitter` | Trim Treesitter to a minimal parser set (lite). |
 | `--no-lazygit` | Skip the lazygit release download. |
 | `--with-console` | Install cage + foot + a Nerd Font; stage `foot.ini`. |
-| `--with-desktop` | Install i3 + Xorg + i3status + alacritty + flameshot + fonts. |
+| `--with-desktop` | Install sway + foot + i3status + wofi + grim/slurp + fonts. |
 | `--with-browser=NAME` | `firefox` \| `chromium` \| `none` (default `none`). Requires `--with-desktop`. |
 
 - `--target-dir /etc/skel` (default) -- a **multi-user template**: each new
@@ -74,17 +74,18 @@ files/
   nvim/lua/config/options.lua       -> overrides LazyVim options (OSC 52 clipboard)
   nvim/lua/plugins/lite-no-mason.lua    -> staged only with --no-mason
   nvim/lua/plugins/lite-treesitter.lua  -> staged only with --minimal-treesitter
-  console/foot.ini                  -> staged only with --with-console
-  desktop/i3/config                 -> staged only with --with-desktop
+  console/foot.ini                  -> staged with --with-console or --with-desktop
+  desktop/sway/config               -> staged only with --with-desktop
   desktop/i3status/config           -> staged only with --with-desktop
-  desktop/alacritty/alacritty.{yml,toml} -> staged (version-matched) with --with-desktop
-  desktop/rofi/config.rasi          -> staged only with --with-desktop
-  desktop/flameshot/flameshot.ini   -> staged only with --with-desktop
+  desktop/wofi/config               -> staged only with --with-desktop
+  desktop/wofi/style.css            -> staged only with --with-desktop
 ```
 
-The terminal for `--with-desktop` is **alacritty** (Rust, memory-safe, minimal
-attack surface; pairs with tmux for multiplexing). `foot` is Wayland-only and is
-used only by `--with-console` (cage). Browsers install as real Raspberry Pi OS
+The terminal for `--with-desktop` is **foot** (Wayland-native, CPU-rendered, tiny;
+pairs with tmux for multiplexing), the same terminal used by `--with-console`
+(cage), with Sixel image support disabled to shrink its attack surface. The
+launcher is **wofi** and screenshots use **grim + slurp + wl-clipboard**. Browsers
+install as real Raspberry Pi OS
 .debs (`firefox-esr` / `chromium-browser`), never snaps.
 
 ## How host overlays consume it
@@ -94,6 +95,6 @@ session launch, provisioning), then runs this core build with the flags it wants
 For example, `azure-dev-terminal` mounts this repo as a git submodule at
 `core-build/` and inlines it (base64 tarball) into its cloud-init custom-data,
 then runs `install.sh --target-dir /etc/skel`. A Pi overlay wires tty1 autologin
-to `cage -s -- foot` (console) or `startx`/i3 (desktop) and runs `install.sh`
+to `cage -s -- foot` (console) or `sway` (desktop) and runs `install.sh`
 with the matching `--with-*` flags. Wiring the session launch is the overlay's
 job; this script only installs packages and stages config.

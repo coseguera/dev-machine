@@ -1,0 +1,8 @@
+# dev-machine wofi config (drun launcher). Wayland-native replacement for rofi.
+show=drun
+prompt=
+insensitive=true
+allow_images=true
+no_actions=true
+width=600
+lines=10

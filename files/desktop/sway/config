@@ -1,6 +1,7 @@
-# i3 config - dev-machine local desktop (Tokyo Night).
-# X11 + a real keyboard, so bindings use bindsym with Super ($mod = Mod4).
-# (This is the local-desktop counterpart to a VNC setup; no Mod1/bindcode hacks.)
+# sway config - dev-machine local desktop (Tokyo Night).
+# sway is the Wayland i3-compatible compositor; a real keyboard drives it, so
+# bindings use bindsym with Super ($mod = Mod4). This is the Wayland counterpart
+# to the former i3/Xorg desktop: same layout/keys, Wayland-native helpers.
 set $mod Mod4
 
 font pango:JetBrainsMono Nerd Font 10
@@ -13,7 +14,7 @@ set $gray #414868
 set $dim  #565f89
 set $red  #f7768e
 
-# gaps (i3 4.22+) and thin borders
+# gaps and thin borders
 gaps inner 8
 gaps outer 3
 smart_gaps on
@@ -27,16 +28,17 @@ client.unfocused        $gray   $bg     $dim  $gray     $gray
 client.urgent           $red    $bg     $fg   $red      $red
 
 # terminal + launcher + kill
-bindsym $mod+Return exec --no-startup-id alacritty
-bindsym $mod+d exec --no-startup-id rofi -show drun
+bindsym $mod+Return exec foot
+bindsym $mod+d exec wofi --show drun
 bindsym $mod+Shift+q kill
 
-# screenshots (flameshot): region select then annotate/copy/save from its toolbar.
-# Print is for keyboards with a PrintScreen key; $mod+Shift+p is the equivalent for
-# keyboards without one. Saved shots default to ~/Pictures (XDG); the toolbar's copy
-# button puts the grab on the clipboard (handy to @-mention in the Copilot CLI).
-bindsym Print exec --no-startup-id flameshot gui
-bindsym $mod+Shift+p exec --no-startup-id flameshot gui
+# screenshots (grim + slurp, Wayland-native): select a region, then copy the grab
+# to the clipboard (wl-copy) and save a timestamped PNG to ~/Pictures (XDG). The
+# clipboard copy is handy to @-mention in the Copilot CLI. Print is for keyboards
+# with a PrintScreen key; $mod+Shift+p is the equivalent for keyboards without one.
+set $screenshot grim -g "$(slurp)" - | tee "$HOME/Pictures/$(date +%Y-%m-%d_%H-%M-%S).png" | wl-copy
+bindsym Print exec $screenshot
+bindsym $mod+Shift+p exec $screenshot
 
 # focus (vim keys + arrows)
 bindsym $mod+h focus left
@@ -82,8 +84,8 @@ bindsym $mod+Shift+5 move container to workspace number 5
 
 # reload / restart / exit
 bindsym $mod+Shift+c reload
-bindsym $mod+Shift+r restart
-bindsym $mod+Shift+e exec --no-startup-id i3-nagbar -m 'Exit i3?' -b 'Yes' 'i3-msg exit'
+bindsym $mod+Shift+r reload
+bindsym $mod+Shift+e exec swaynag -t warning -m 'Exit sway?' -B 'Yes' 'swaymsg exit'
 
 # resize mode (plain keys, no mod)
 mode "resize" {
@@ -96,16 +98,15 @@ mode "resize" {
 }
 bindsym $mod+r mode "resize"
 
-# adapt font/bar size to the display dpi (re-applies on monitor hotplug)
-exec_always --no-startup-id ~/.config/i3/set-dpi.sh
+# HiDPI: sway scales natively per output (no xrandr/Xft.dpi script needed). Fonts
+# stay one size in the configs; the compositor does the scaling. Adjust the factor
+# per panel if needed (e.g. 2 for a 4K display); 1 keeps 1:1 on standard panels.
+output * scale 1
 
-# solid Tokyo Night background (no compositor/wallpaper dependency)
-exec_always --no-startup-id xsetroot -solid "#1a1b26"
+# solid Tokyo Night background (no wallpaper dependency)
+output * bg $bg solid_color
 
-# flameshot daemon (so `flameshot gui` is instant; tray icon disabled in config)
-exec --no-startup-id flameshot
-
-# bar: i3's built-in bar + i3status (lightweight; no polybar dependency)
+# bar: swaybar + i3status (lightweight; i3status runs unchanged under sway)
 bar {
         status_command i3status
         separator_symbol " "
