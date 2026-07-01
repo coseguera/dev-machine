@@ -10,7 +10,7 @@
 # This script is intentionally HOST/CLOUD-UNAWARE: it knows nothing about Entra
 # ID, cloud-init, JIT, NSGs, USB-gadget, autologin, or admin accounts. It only
 # installs packages and stages config into --target-dir. Wiring a host's session
-# launch (tty1 autologin -> cage+foot, or startx -> i3, or Azure provisioning)
+# launch (tty1 autologin -> cage+foot, or sway, or Azure provisioning)
 # is the job of the host overlay that CALLS this script.
 #
 # What it installs (system-wide, on PATH), subject to flags:
@@ -22,7 +22,7 @@
 #   - Neovim (release) + LazyVim starter config                  (always)
 #   - lazygit (release)                                           (unless --no-lazygit)
 #   - cage + foot + Nerd Font (local kiosk console)              (--with-console)
-#   - i3 + Xorg + i3status + alacritty + flameshot + fonts (desktop) (--with-desktop)
+#   - sway + foot + i3status + wofi + grim/slurp + fonts (desktop) (--with-desktop)
 #   - a browser                                                   (--with-browser=...)
 #
 # LazyVim "lite" knobs (staged as override Lua specs, only when set):
@@ -41,7 +41,7 @@
 #     --minimal-treesitter    Trim Treesitter to a minimal parser set.
 #     --no-lazygit            Skip the lazygit release download.
 #     --with-console          Install cage + foot + a Nerd Font; stage foot.ini.
-#     --with-desktop          Install i3 + Xorg + i3status + alacritty + flameshot.
+#     --with-desktop          Install sway + foot + i3status + wofi + grim/slurp.
 #     --with-browser=NAME     firefox | chromium | none (default none).
 #                             Requires --with-desktop when not 'none'.
 #     -h | --help             Show this header.
@@ -84,7 +84,7 @@ FILES_DIR="$SCRIPT_DIR/files"
 log()  { echo "[dev-machine] $*"; }
 die()  { echo "[dev-machine] ERROR: $*" >&2; exit 1; }
 
-# Install JetBrainsMono Nerd Font system-wide (glyphs for foot/i3/terminals).
+# Install JetBrainsMono Nerd Font system-wide (glyphs for foot/sway/terminals).
 # Arch-independent (font files). Idempotent: skips if already installed.
 install_nerd_font() {
   if fc-list 2>/dev/null | grep -qi "JetBrainsMono Nerd Font"; then
@@ -234,17 +234,18 @@ if [ "$WITH_CONSOLE" -eq 1 ]; then
   install_nerd_font
 fi
 
-# --- Local desktop: i3 + Xorg + i3status + alacritty + browser -----------------
-# Installs the packages and stages the rice configs (i3, i3status, alacritty,
-# rofi). Wiring startx/i3 launch on tty1 is the host overlay's job (this script
-# stays session-launch-agnostic). Terminal is alacritty (Rust, memory-safe,
-# minimal attack surface). Config staging happens in the staging section below.
+# --- Local desktop: sway + foot + i3status + wofi + browser --------------------
+# Installs the packages and stages the rice configs (sway, i3status, wofi).
+# Wiring the sway launch on tty1 is the host overlay's job (this script stays
+# session-launch-agnostic). Terminal is foot (Wayland-native, CPU-rendered, tiny;
+# shared with the console target; sixel disabled in foot.ini). Screenshots use
+# grim + slurp + wl-clipboard. Config staging happens in the staging section below.
 if [ "$WITH_DESKTOP" -eq 1 ]; then
-  log "installing local desktop (i3 + Xorg + alacritty)"
+  log "installing local desktop (sway + foot)"
   apt-get install -y \
-    xserver-xorg xinit x11-xserver-utils \
-    i3 rofi alacritty \
-    flameshot \
+    sway foot wofi \
+    i3status \
+    grim slurp wl-clipboard \
     fontconfig fonts-noto-color-emoji \
     || die "desktop package install failed"
   install_nerd_font
@@ -274,8 +275,10 @@ fi
 RC
 fi
 
-# --- Stage foot.ini when the console was installed ---------------------------
-if [ "$WITH_CONSOLE" -eq 1 ]; then
+# --- Stage foot.ini when foot was installed (console OR desktop) --------------
+# foot is the terminal for both the console (cage) and the desktop (sway) targets,
+# so stage its single shared config whenever either was requested.
+if [ "$WITH_CONSOLE" -eq 1 ] || [ "$WITH_DESKTOP" -eq 1 ]; then
   log "staging foot.ini into $TARGET_DIR"
   mkdir -p "$TARGET_DIR/.config/foot"
   install -m 0644 "$FILES_DIR/console/foot.ini" "$TARGET_DIR/.config/foot/foot.ini"
@@ -283,37 +286,16 @@ fi
 
 # --- Stage desktop rice configs when the desktop was installed ---------------
 if [ "$WITH_DESKTOP" -eq 1 ]; then
-  log "staging desktop configs (i3, i3status, alacritty, rofi) into $TARGET_DIR"
-  mkdir -p "$TARGET_DIR/.config/i3" "$TARGET_DIR/.config/i3status" \
-           "$TARGET_DIR/.config/alacritty" "$TARGET_DIR/.config/rofi"
-  install -m 0644 "$FILES_DIR/desktop/i3/config"        "$TARGET_DIR/.config/i3/config"
-  install -m 0755 "$FILES_DIR/desktop/i3/set-dpi.sh"    "$TARGET_DIR/.config/i3/set-dpi.sh"
+  log "staging desktop configs (sway, i3status, wofi) into $TARGET_DIR"
+  mkdir -p "$TARGET_DIR/.config/sway" "$TARGET_DIR/.config/i3status" \
+           "$TARGET_DIR/.config/wofi" "$TARGET_DIR/Pictures"
+  install -m 0644 "$FILES_DIR/desktop/sway/config"      "$TARGET_DIR/.config/sway/config"
   install -m 0644 "$FILES_DIR/desktop/i3status/config"  "$TARGET_DIR/.config/i3status/config"
-  install -m 0644 "$FILES_DIR/desktop/rofi/config.rasi" "$TARGET_DIR/.config/rofi/config.rasi"
-  # flameshot screenshots (bound to Print / $mod+Shift+p in i3). Config disables the
-  # tray icon (i3bar has no systray here) and the startup popup; savePath is left
-  # unset so flameshot uses the XDG Pictures dir (~/Pictures), which keeps this
-  # home-agnostic for /etc/skel-based multi-user provisioning. Pre-create ~/Pictures
-  # so the first save never fails on a minimal image.
-  mkdir -p "$TARGET_DIR/.config/flameshot" "$TARGET_DIR/Pictures"
-  install -m 0644 "$FILES_DIR/desktop/flameshot/flameshot.ini" "$TARGET_DIR/.config/flameshot/flameshot.ini"
-  # alacritty switched its config format from YAML to TOML in 0.13; stage the form
-  # that matches the installed version (Pi OS Bookworm ships 0.12 = YAML).
-  av="$(alacritty --version 2>/dev/null | awk '{print $2}')"   # e.g. 0.12.3
-  use_toml=0
-  if [ -n "$av" ]; then
-    maj="${av%%.*}"; rest="${av#*.}"; min="${rest%%.*}"
-    if [ "${maj:-0}" -gt 0 ] 2>/dev/null || { [ "${maj:-0}" -eq 0 ] && [ "${min:-0}" -ge 13 ]; } 2>/dev/null; then
-      use_toml=1
-    fi
-  fi
-  if [ "$use_toml" -eq 1 ]; then
-    install -m 0644 "$FILES_DIR/desktop/alacritty/alacritty.toml" "$TARGET_DIR/.config/alacritty/alacritty.toml"
-    rm -f "$TARGET_DIR/.config/alacritty/alacritty.yml"
-  else
-    install -m 0644 "$FILES_DIR/desktop/alacritty/alacritty.yml" "$TARGET_DIR/.config/alacritty/alacritty.yml"
-    rm -f "$TARGET_DIR/.config/alacritty/alacritty.toml"
-  fi
+  install -m 0644 "$FILES_DIR/desktop/wofi/config"      "$TARGET_DIR/.config/wofi/config"
+  install -m 0644 "$FILES_DIR/desktop/wofi/style.css"   "$TARGET_DIR/.config/wofi/style.css"
+  # Pre-create ~/Pictures so the first grim/slurp screenshot save never fails on a
+  # minimal image. savePath is the XDG Pictures dir, keeping this home-agnostic for
+  # /etc/skel-based multi-user provisioning.
 fi
 
 # --- Stage the LazyVim config into TARGET ------------------------------------
