@@ -32,6 +32,17 @@ bindsym $mod+Return exec foot
 bindsym $mod+d exec wofi --show drun
 bindsym $mod+Shift+q kill
 
+# screen lock (swaylock, Tokyo Night solid color -- see swaylock/config) plus
+# swayidle: auto-lock after 15 min idle, blank the display shortly after the
+# lock fires, and lock before any suspend/sleep. swayidle is event-driven
+# (Wayland idle-notify), so it costs nothing while the machine is active.
+bindsym $mod+Shift+x exec swaylock
+exec swayidle -w \
+  timeout 900 'swaylock -f' \
+  timeout 910 'swaymsg "output * dpms off"' \
+  resume 'swaymsg "output * dpms on"' \
+  before-sleep 'swaylock -f'
+
 # screenshots (grim + slurp, Wayland-native): select a region, then copy the grab
 # to the clipboard (wl-copy) and save a timestamped PNG to ~/Pictures (XDG). The
 # clipboard copy is handy to @-mention in the Copilot CLI. Print is for keyboards
