@@ -235,17 +235,22 @@ if [ "$WITH_CONSOLE" -eq 1 ]; then
 fi
 
 # --- Local desktop: sway + foot + i3status + wofi + browser --------------------
-# Installs the packages and stages the rice configs (sway, i3status, wofi).
-# Wiring the sway launch on tty1 is the host overlay's job (this script stays
-# session-launch-agnostic). Terminal is foot (Wayland-native, CPU-rendered, tiny;
-# shared with the console target; sixel disabled in foot.ini). Screenshots use
-# grim + slurp + wl-clipboard. Config staging happens in the staging section below.
+# Installs the packages and stages the rice configs (sway, i3status, wofi,
+# swaylock). Wiring the sway launch on tty1 is the host overlay's job (this
+# script stays session-launch-agnostic). Terminal is foot (Wayland-native,
+# CPU-rendered, tiny; shared with the console target; sixel disabled in
+# foot.ini). Screenshots use grim + slurp + wl-clipboard. Screen locking uses
+# swaylock (manual, $mod+Shift+x) + swayidle (15-min auto-lock, autostarted
+# from the sway config -- no separate service/config staging beyond
+# swaylock's own config file). Config staging happens in the staging section
+# below.
 if [ "$WITH_DESKTOP" -eq 1 ]; then
   log "installing local desktop (sway + foot)"
   apt-get install -y \
     sway foot wofi \
     i3status \
     grim slurp wl-clipboard \
+    swaylock swayidle \
     fontconfig fonts-noto-color-emoji \
     || die "desktop package install failed"
   install_nerd_font
@@ -286,13 +291,15 @@ fi
 
 # --- Stage desktop rice configs when the desktop was installed ---------------
 if [ "$WITH_DESKTOP" -eq 1 ]; then
-  log "staging desktop configs (sway, i3status, wofi) into $TARGET_DIR"
+  log "staging desktop configs (sway, i3status, wofi, swaylock) into $TARGET_DIR"
   mkdir -p "$TARGET_DIR/.config/sway" "$TARGET_DIR/.config/i3status" \
-           "$TARGET_DIR/.config/wofi" "$TARGET_DIR/Pictures"
+           "$TARGET_DIR/.config/wofi" "$TARGET_DIR/.config/swaylock" \
+           "$TARGET_DIR/Pictures"
   install -m 0644 "$FILES_DIR/desktop/sway/config"      "$TARGET_DIR/.config/sway/config"
   install -m 0644 "$FILES_DIR/desktop/i3status/config"  "$TARGET_DIR/.config/i3status/config"
   install -m 0644 "$FILES_DIR/desktop/wofi/config"      "$TARGET_DIR/.config/wofi/config"
   install -m 0644 "$FILES_DIR/desktop/wofi/style.css"   "$TARGET_DIR/.config/wofi/style.css"
+  install -m 0644 "$FILES_DIR/desktop/swaylock/config"  "$TARGET_DIR/.config/swaylock/config"
   # Pre-create ~/Pictures so the first grim/slurp screenshot save never fails on a
   # minimal image. savePath is the XDG Pictures dir, keeping this home-agnostic for
   # /etc/skel-based multi-user provisioning.

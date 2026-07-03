@@ -1,0 +1,36 @@
+# swaylock config - dev-machine local desktop (Tokyo Night).
+# Solid-color lock screen (no image/blur dependency), matching the palette
+# used in sway/config and wofi's style.css.
+color=1a1b26
+
+# Disable the last-frame screenshot/effects entirely; always show the solid
+# background color above instead.
+ignore-empty-password
+
+# Indicator ring / text feedback while typing the password.
+indicator
+indicator-radius=100
+indicator-thickness=10
+indicator-caps-lock
+
+ring-color=414868
+ring-clear-color=f7768e
+ring-ver-color=7aa2f7
+ring-wrong-color=f7768e
+
+inside-color=1a1b26
+inside-clear-color=1a1b26
+inside-ver-color=1a1b26
+inside-wrong-color=1a1b26
+
+line-color=1a1b26
+line-clear-color=1a1b26
+line-ver-color=1a1b26
+line-wrong-color=1a1b26
+
+text-color=c0caf5
+text-clear-color=c0caf5
+text-ver-color=c0caf5
+text-wrong-color=f7768e
+
+font=JetBrainsMono Nerd Font
