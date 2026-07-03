@@ -228,9 +228,14 @@ fi
 # --- Local console: cage (Wayland kiosk) + foot (truecolor terminal) ---------
 # Installs the packages and stages foot.ini. Wiring tty1 autologin -> `cage -s --
 # foot` is the host overlay's job (this script stays session-launch-agnostic).
+# vlock: cage is a minimal kiosk compositor and does not implement the
+# wlr-input-inhibitor protocol, so swaylock cannot actually grab input here
+# (it would only draw a cosmetic lock screen). vlock locks a real terminal at
+# the POSIX tty/PAM layer instead, sidestepping Wayland entirely -- triggered
+# via the tmux keybinding staged below (tmux.conf: <prefix> X).
 if [ "$WITH_CONSOLE" -eq 1 ]; then
   log "installing local console (cage + foot)"
-  apt-get install -y cage foot fontconfig || die "console package install failed"
+  apt-get install -y cage foot fontconfig vlock || die "console package install failed"
   install_nerd_font
 fi
 
