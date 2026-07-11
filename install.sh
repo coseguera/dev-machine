@@ -330,6 +330,9 @@ fi
 # Staged into lua/plugins/ so they layer on top of the starter regardless of when
 # the config was first cloned (idempotent: install -m re-copies on every run).
 mkdir -p "$SKEL_NVIM/lua/plugins"
+# gitsigns inline-diff toggle: always staged (QoL keybinding, no flag gating).
+install -m 0644 "$FILES_DIR/nvim/lua/plugins/gitsigns.lua" \
+  "$SKEL_NVIM/lua/plugins/gitsigns.lua"
 if [ "$NO_MASON" -eq 1 ]; then
   log "staging --no-mason LazyVim override"
   install -m 0644 "$FILES_DIR/nvim/lua/plugins/lite-no-mason.lua" \
