@@ -72,6 +72,8 @@ files/
   bashrc.d/10-dev-machine.sh        -> <target>/.bashrc.d/
   lazygit/config.yml                -> <target>/.config/lazygit/config.yml
   nvim/lua/config/options.lua       -> overrides LazyVim options (OSC 52 clipboard)
+  nvim/lua/plugins/gitsigns.lua     -> LazyGit-style inline git diff toggle (<leader>g<space>)
+  nvim/lua/plugins/snacks.lua       -> Snacks terminal as a wide right-side float
   nvim/lua/plugins/lite-no-mason.lua    -> staged only with --no-mason
   nvim/lua/plugins/lite-treesitter.lua  -> staged only with --minimal-treesitter
   console/foot.ini                  -> staged with --with-console or --with-desktop
