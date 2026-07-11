@@ -333,6 +333,9 @@ mkdir -p "$SKEL_NVIM/lua/plugins"
 # gitsigns inline-diff toggle: always staged (QoL keybinding, no flag gating).
 install -m 0644 "$FILES_DIR/nvim/lua/plugins/gitsigns.lua" \
   "$SKEL_NVIM/lua/plugins/gitsigns.lua"
+# Snacks terminal wide right-side float: always staged (QoL tweak, no flag gating).
+install -m 0644 "$FILES_DIR/nvim/lua/plugins/snacks.lua" \
+  "$SKEL_NVIM/lua/plugins/snacks.lua"
 if [ "$NO_MASON" -eq 1 ]; then
   log "staging --no-mason LazyVim override"
   install -m 0644 "$FILES_DIR/nvim/lua/plugins/lite-no-mason.lua" \
